@@ -45,7 +45,7 @@ export class App implements OnInit {
       return; 
     }
 
-    this.chatWs = new WebSocket(`wss://${window.location.hostname}:8000/ws/chat`);
+    this.chatWs = new WebSocket('wss://pilates-backend-7b1i.onrender.com/ws/chat');
 
     this.chatWs.onopen = () => {
       console.log('Chat WebSocket is OPEN');

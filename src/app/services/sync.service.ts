@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class SyncService {
   private http = inject(HttpClient);
-  private apiUrl = `https://${window.location.hostname}:8000/sessions`;
+  private apiUrl = 'https://pilates-backend-7b1i.onrender.com/sessions';
   
   isOnline = new BehaviorSubject<boolean>(navigator.onLine);
 

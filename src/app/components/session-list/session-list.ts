@@ -57,7 +57,7 @@ export class SessionList implements OnInit {
       }
     });
 
-    const ws = new WebSocket(`wss://${window.location.hostname}:8000/ws`);
+    const ws = new WebSocket('wss://pilates-backend-7b1i.onrender.com/ws');
     ws.onmessage = (event) => {
       if (event.data === 'UPDATE_REQUIRED') {
         this.refreshList();
@@ -72,7 +72,7 @@ export class SessionList implements OnInit {
       type: ['', Validators.required]
     });
 
-    this.chatWs = new WebSocket(`wss://${window.location.hostname}:8000/ws/chat`);
+    this.chatWs = new WebSocket('wss://pilates-backend-7b1i.onrender.com/ws/chat');
     this.chatWs.onmessage = (event) => {
       const message = JSON.parse(event.data);
       this.chatMessages.push(message);
@@ -160,7 +160,7 @@ export class SessionList implements OnInit {
     
     const userId = localStorage.getItem('user_id');
     
-    this.http.post(`https://${window.location.hostname}:8000/admin/start?user_id=${userId}`, {}).subscribe({
+    this.http.post('https://pilates-backend-7b1i.onrender.com/admin/start?user_id=${userId}', {}).subscribe({
       error: (err) => { console.error(err); this.isGeneratorRunning = false; }
     });
   }
@@ -169,7 +169,7 @@ export class SessionList implements OnInit {
     this.isGeneratorRunning = false;
     this.cdr.detectChanges();
     
-    this.http.post(`https://${window.location.hostname}:8000/admin/stop`, {}).subscribe();
+    this.http.post('https://pilates-backend-7b1i.onrender.com/admin/stop', {}).subscribe();
   }
 
   clearAllSessions() {
@@ -177,7 +177,7 @@ export class SessionList implements OnInit {
       this.isClearing = true;
       this.cdr.detectChanges();
       
-      this.http.delete(`https://${window.location.hostname}:8000/admin/clear`).subscribe({
+      this.http.delete('https://pilates-backend-7b1i.onrender.com/admin/clear').subscribe({
         next: () => {
           setTimeout(() => { 
             this.isClearing = false; 

@@ -12,7 +12,7 @@ export class SessionService {
   private syncService = inject(SyncService);
   
   private currentIp = window.location.hostname;
-  private apiUrl = `https://${this.currentIp}:8000/sessions`;
+  private apiUrl = 'https://pilates-backend-7b1i.onrender.com/sessions';
 
   private getUserId(): string {
     return localStorage.getItem('user_id') || '';

@@ -8,7 +8,7 @@ import { BehaviorSubject, tap } from 'rxjs';
 export class AuthService {
   private http = inject(HttpClient);
   private currentIp = window.location.hostname;
-  private apiUrl = `https://${this.currentIp}:8000`;
+  private apiUrl = 'https://pilates-backend-7b1i.onrender.com';
   private timeoutId: any;
 
   currentUserRole = new BehaviorSubject<string | null>(localStorage.getItem('role'));
