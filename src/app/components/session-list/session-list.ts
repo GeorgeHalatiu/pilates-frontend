@@ -160,7 +160,7 @@ export class SessionList implements OnInit {
     
     const userId = localStorage.getItem('user_id');
     
-    this.http.post('https://pilates-backend-7b1i.onrender.com/admin/start?user_id=${userId}', {}).subscribe({
+    this.http.post('https://pilates-backend-7b1i.onrender.com/admin/start?user_id=' + userId, {}).subscribe({
       error: (err) => { console.error(err); this.isGeneratorRunning = false; }
     });
   }
@@ -173,11 +173,13 @@ export class SessionList implements OnInit {
   }
 
   clearAllSessions() {
+    const userId = localStorage.getItem('user_id');
+
     if (confirm("Are you absolutely sure you want to wipe the entire schedule?")) {
       this.isClearing = true;
       this.cdr.detectChanges();
       
-      this.http.delete('https://pilates-backend-7b1i.onrender.com/admin/clear').subscribe({
+      this.http.delete('https://pilates-backend-7b1i.onrender.com/admin/clear?user_id=' + userId).subscribe({
         next: () => {
           setTimeout(() => { 
             this.isClearing = false; 
