@@ -1,0 +1,133 @@
+<div class="my-sessions-container">
+  <header class="page-header">
+    <h2>My Sessions</h2>
+    <p>View and manage your booked Pilates sessions</p>
+  </header>
+
+  <div *ngIf="isAdmin()" class="admin-controls-panel" style="margin-bottom: 20px; padding: 20px; background: #fdf5f5; border-radius: 12px; border: 1px solid #f5c6c6;">
+    <h3 style="color: #d9534f; margin-top: 0;">Admin Studio Controls</h3>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <button style="padding: 10px 15px; background: #8b9b7e; color: white; border: none; border-radius: 6px; cursor: pointer;" 
+              [disabled]="isGeneratorRunning" 
+              (click)="startGenerator()">
+              {{ isGeneratorRunning ? 'Generator is Running...' : 'Start Generator' }}
+      </button>
+      <button style="padding: 10px 15px; background: #666; color: white; border: none; border-radius: 6px; cursor: pointer;" 
+              [disabled]="!isGeneratorRunning" 
+              (click)="stopGenerator()">Stop Generator
+      </button>
+      <button style="padding: 10px 15px; background: #d9534f; color: white; border: none; border-radius: 6px; cursor: pointer;" 
+              [disabled]="isClearing" 
+              (click)="clearAllSessions()">
+              {{ isClearing ? 'Clearing Database...' : 'Clear Entire Schedule' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="custom-card table-card">
+    <div class="table-header">
+      <h3>Booked Sessions</h3>
+      <p>Total: {{ allSessions.length }} session{{ allSessions.length !== 1 ? 's' : '' }}</p>
+    </div>
+
+    <table class="elegant-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Type</th>
+          <th>Instructor</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="allSessions.length === 0">
+          <td colspan="5" class="empty-state">
+            No upcoming sessions booked. <a routerLink="/schedule">Book your first session</a>
+          </td>
+        </tr>
+        <tr *ngFor="let session of paginatedSessions">
+          <td data-label="Date">{{ session.date | date:'E, MMM d, y' }}</td>
+          <td data-label="Time">{{ session.time }}</td>
+          <td data-label="Type"><span class="type-pill">{{ session.type }}</span></td>
+          <td data-label="Instructor">{{ session.instructor }}</td>
+          <td data-label="Actions" class="actions-col">
+            <button class="icon-btn" (click)="viewDetails(session)" title="View Details">👁️</button>
+            <button class="icon-btn" (click)="openEdit(session)" title="Reschedule">✏️</button>
+            <button class="icon-btn delete-btn" (click)="delete(session.id)" title="Cancel Session">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination-controls" *ngIf="allSessions.length > pageSize">
+      <button class="page-btn" [disabled]="currentPage === 1" (click)="prevPage()">Previous</button>
+      <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showDetailsModal && selectedSession" (click)="showDetailsModal = false">
+  <div class="modal-content details-modal" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="showDetailsModal = false">✕</button>
+    <h3>Session Details</h3>
+    <div class="detail-card">
+      <div class="detail-icon">📅</div>
+      <div>
+        <span class="detail-label">Date</span>
+        <span class="detail-value">{{ selectedSession.date | date:'E, MMM d, y' }}</span>
+      </div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-icon">⏱️</div>
+      <div>
+        <span class="detail-label">Time</span>
+        <span class="detail-value">{{ selectedSession.time }}</span>
+      </div>
+    </div>
+    <div class="detail-card large-detail-card">
+      <div class="detail-group">
+        <span class="detail-label">Session Type</span>
+        <span class="detail-value">{{ selectedSession.type }}</span>
+      </div>
+      <div class="detail-group">
+        <span class="detail-label">Instructor</span>
+        <span class="detail-value">{{ selectedSession.instructor }}</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="secondary-btn" (click)="showDetailsModal = false">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showEditModal" (click)="showEditModal = false">
+  <div class="modal-content edit-modal" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="showEditModal = false">✕</button>
+    <h3>Reschedule Session</h3>
+    <form [formGroup]="editForm" class="edit-form-layout">
+      <div class="form-group">
+        <label>Select New Date</label>
+        <input type="date" formControlName="date" class="elegant-input">
+      </div>
+      <div class="form-group">
+        <label>Select New Time</label>
+        <select formControlName="time" class="elegant-input">
+          <option *ngFor="let t of availableTimes" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Session Type</label>
+        <div class="pill-selector">
+          <button type="button" class="type-btn" [class.active]="editForm.get('type')?.value === 'Mat Session'" (click)="setEditType('Mat Session')">Mat Session</button>
+          <button type="button" class="type-btn" [class.active]="editForm.get('type')?.value === 'Reformer Session'" (click)="setEditType('Reformer Session')">Reformer Session</button>
+        </div>
+      </div>
+      <div class="modal-actions split-actions">
+        <button type="button" class="cancel-btn" (click)="showEditModal = false">Cancel</button>
+        <button type="button" class="primary-btn confirm-modal-btn" [disabled]="editForm.invalid" (click)="saveChanges()">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>

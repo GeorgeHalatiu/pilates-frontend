@@ -1,0 +1,85 @@
+<div class="schedule-container">
+  <header class="page-header">
+    <h2>Reserve Your Mat</h2>
+    <p>"The greatest wealth is health." Take your time to find a session that fits your rhythm.</p>
+  </header>
+
+  <div class="custom-card date-strip-card">
+    <div class="month-header">
+      <span class="month-title">{{ currentMonthYear }}</span>
+    </div>
+    
+    <div class="date-scroller">
+      <div class="date-box" 
+           *ngFor="let d of availableDates"
+           [class.active]="sessionForm.get('date')?.value === d.full"
+           (click)="selectDate(d)">
+        <span class="day-name">{{ d.day }}</span>
+        <span class="day-num">{{ d.num }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="time-slots-container">
+    <div class="time-card custom-card" 
+         *ngFor="let t of availableTimes"
+         [class.active]="sessionForm.get('time')?.value === t"
+         (click)="selectTime(t)">
+      <div class="time-info">
+        <span class="time-text">{{ t }}</span>
+        <span class="availability">Open spots available</span>
+      </div>
+      <button class="select-time-btn">Select Time</button>
+    </div>
+  </div>
+</div> 
+
+<div class="modal-overlay" *ngIf="showTypeModal" (click)="showTypeModal = false">
+  <div class="modal-content type-modal" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="showTypeModal = false">✕</button>
+    
+    <h3>Choose Session Type</h3>
+    <p class="modal-subtitle">{{ sessionForm.get('date')?.value }} at {{ sessionForm.get('time')?.value }}</p>
+
+    <div class="type-cards-container">
+      <div class="type-choice-card" 
+           *ngFor="let type of sessionTypes"
+           [class.selected]="sessionForm.get('type')?.value === type.id"
+           (click)="selectType(type.id)">
+        <h4>{{ type.title }}</h4>
+        <p>{{ type.desc }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showInstructorModal" (click)="showInstructorModal = false">
+  <div class="modal-content instructor-modal" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="showInstructorModal = false">✕</button>
+
+    <h3>Select Your Instructor</h3>
+    <p class="modal-subtitle">{{ sessionForm.get('date')?.value }} at {{ sessionForm.get('time')?.value }}</p>
+
+    <div class="instructor-list">
+      <div class="instructor-item" 
+           *ngFor="let inst of instructors"
+           (click)="selectTempInstructor(inst.name)">
+        <div class="radio-circle" [class.active]="tempInstructor === inst.name"></div>
+        <div class="inst-info">
+          <h4>{{ inst.name }}</h4>
+          <p>{{ inst.desc }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="showInstructorModal = false">Cancel</button>
+      
+      <button class="primary-btn confirm-modal-btn" 
+              [disabled]="sessionForm.invalid" 
+              (click)="confirmInstructor()">
+        Confirm Booking
+      </button>
+    </div>
+  </div>
+</div>
